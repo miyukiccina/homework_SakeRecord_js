@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Chatアプリ</title>
+  <style>
+  </style>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+</head>
+
+<!-- ↑ここまで基本のコード -->
+
+<body>
+  <!-- ブラウザの画面に見える内容 -->
+  <div class="header">
+    <div>私の日本酒記録</div>
+  </div>
+
+
+  <div class="body-wrapper">
+  
+    <div class="inputform">
+      <div>
+        <!-- お酒の名前 -->
+        名前：
+        <input type="text" id="name">
+        </div>
+
+
+      <div>
+      <!-- お酒の産地 -->
+      産地：
+      <input type="text" id="place">
+      </div>
+
+      <div class="advise">何と一緒に飲んだか、どこで飲んだかなど 記録してみよう</div>
+
+      <div>
+        <!-- テキストエリア：感想 -->
+        <textarea name="" id="comment" cols="50" rows="10"></textarea>
+      </div>
+
+      <div>
+        <!-- 画像入力 -->
+        <p>写真のアップロード↓
+        </p><input type="file" id="photo" accept="image/jpeg, image/png">
+      </div>
+
+      <div>
+        <!-- 記録ボタン -->
+        <button id="send">記録</button>
+      </div>
+      
+    </div>
+
+    <div class="history">
+      <!-- 保存されたデータが表示される箇所 -->
+      <div class="historyform">今まで飲んだもの</div>
+      <div id="output"></div>
+      <div class="phto-form"><img src="" /></div>
+    </div>　
+
+  </div>
+
+  <div class="footer">
+    <div>Miyuki Nishida</div>
+  </div>
+
+</div>
+
+
+
+
+
+  <!--/ ブラウザの画面に見える内容 -->
+
+  <!-- JQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <!--** 以下Firebase **-->
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <!-- ここにfirebaseのscriptを貼り付ける -->
+  <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+    apiKey: "",
+    authDomain: "",
+    databaseURL: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: "",
+    measurementId: ""
+  };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    //firebaseのデーターベース（保存させる場所）を使いますよと言うjsのコードを貼り付ける
+    // xxxxxスクリプトを貼り付ける
+    const newPostRef = firebase.database().ref();
+
+    // 送信ボタンをクリックされたら次の処理をする
+    $("#send").on("click", function () {
+      
+
+       // データを登録で送る
+       newPostRef.push({
+        //お酒の名前
+        name: $("#name").val(),
+        //産地
+        place: $("#place").val(),
+
+        comment: $("#comment").val(),
+
+        photo: $("#photo").val(),
+      })
+    
+
+      // 文字を空にする
+      $("#name").val(""); //空にする
+      $("#place").val(""); //空にする
+      $("#comment").val(""); //空にする
+      $("#photo").val(""); //空にする
+
+    });
+
+
+    newPostRef.on("child_added", function (data) {
+      // function (data)のdataにfirebaseのデータが入ってくる
+      // 自分：変数に上記で取得したデータを入れ込む、変数の名前をVとする
+      let v = data.val();
+      //console.logで受信=firebaseに登録されている中身を確認
+      console.log(v,"firebaseのデータが入ってきます")
+      //テンプレートリテラル `` を活用して変数にhtmlを埋め込もう！
+      let str = `<p>＊＊＊ ${v.name} -- ${v.place} ＊＊＊<br>${v.comment}</p>`;
+      let str2 = `<p>${v.photo}</p>`;
+      // ここでデータをhtmlに埋め込む prependには変数を埋め込もう！
+      $("#output").prepend(str);
+      // $("#output-photo").prepend(str2);
+      $("img.src").prepend(str2);
+
+    });
+
+    
+  </script>
+</body>
+
+</html>
+
+<!-- 写真アップロードできるようにしたい -->
+<!-- テキストエリアの中に書き込みで消える薄文字を書きたい -->
